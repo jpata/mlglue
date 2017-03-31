@@ -4,6 +4,15 @@ This library contains tools to simplify conversion between models in different m
 In particular, it contains conversion code for `sklearn -> TMVA` and `xgboost -> TMVA`.
 Binary classification, multiclass and regression trees are supported.
 
+Exporting to TMVA XML:
+╔════════════╦═════════╦═════════╗
+║    type    ║ sklearn ║ xgboost ║
+╠════════════╬═════════╬═════════╣
+║ binary     ║ x       ║ x       ║
+║ multiclass ║ x       ║         ║
+║ regression ║ x       ║         ║
+╚════════════╩═════════╩═════════╝
+
 ### Installation
 
 Clone this repository, install with
