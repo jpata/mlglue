@@ -1,4 +1,6 @@
 import sys
+
+import mlglue
 from mlglue import sklearn_to_tmva
 
 import sklearn
@@ -14,7 +16,9 @@ import ROOT, array
 from ROOT import TMVA
 from sklearn.datasets import fetch_mldata
 
-def test_bdt(ntrees, data_x, data_y, kind):
+from sklearn.datasets import load_svmlight_files
+
+def test_bdt(data_x, data_y, kind, ntrees=10):
     """Simple test function for a scikit-learn BDT.
     Trains the BDT via scikit-learn, exports to TMVA, compares the scikit-learn and TMVA evaluation
     and calculates the total deviance (sum of suqares of differences).
@@ -53,8 +57,8 @@ def test_bdt(ntrees, data_x, data_y, kind):
             learning_rate=0.01,
             n_estimators=ntrees,
             verbose=True,
-            min_samples_leaf=1,
-            min_samples_split=1,
+            #min_samples_leaf=1,
+            #min_samples_split=2,
             loss = "deviance"
         )
     elif kind == "regression":
@@ -67,8 +71,8 @@ def test_bdt(ntrees, data_x, data_y, kind):
             learning_rate=0.01,
             n_estimators=ntrees,
             verbose=True,
-            min_samples_leaf=1,
-            min_samples_split=1,
+            #min_samples_leaf=1,
+            #min_samples_split=2,
         )
 
     cls.fit(data_x, data_y, weights)
@@ -92,10 +96,9 @@ def test_bdt(ntrees, data_x, data_y, kind):
     mva = reader.BookMVA("testmva", "test.xml")
 
     #helper function to evaluate TMVA
-    def eval_tmva(*xs):
-        for x, varname in zip(xs, vars_x):
-            xv = np.array([x])
-            vardict[varname][0] = xv.astype(np.float32)[0]
+    def eval_tmva(xs):
+        for ivar, varname in enumerate(vars_x):
+            vardict[varname][0] = xs[0, ivar]
         if kind == "classification":
             if len(classes)>2:
                 ret = reader.EvaluateMulticlass("testmva")
@@ -116,7 +119,7 @@ def test_bdt(ntrees, data_x, data_y, kind):
         #this transformation does not change the final discrimination, but simply
         #the "shape" of the discriminant
         v1 = sklearn_to_tmva.evaluate_sklearn(cls, xs.reshape(1, -1))[0]
-        v2 = eval_tmva(*xs)
+        v2 = eval_tmva(xs)
         tot_dev += np.sum(np.power(v1 - v2, 2))
 
     return tot_dev/float(N_points)
@@ -127,53 +130,61 @@ import unittest
 
 class TestScikitLearnTMVA(unittest.TestCase):
 
+    def setUp(self):
+        # self.usps = fetch_mldata("usps")
+        # self.data_x = self.usps.data 
+        # self.data_y = self.usps.target 
+        data= load_svmlight_files(("usps", "usps.t"))
+        self.data_x, self.data_y = data[0].todense(), data[1]
+
+
+    # def test_cls_to_nodetree(self):
+
+    #     cls = GradientBoostingClassifier(
+    #         max_depth=2,
+    #         learning_rate=0.01,
+    #         n_estimators=1,
+    #         verbose=True,
+    #         loss = "deviance"
+    #     )
+    #     cls.fit(self.data_x, self.data_y > 5)
+
+    #     nodetree = {}
+    #     sklearn_to_tmva.cls_to_nodetree(
+    #         cls,
+    #         nodetree,
+    #         cls.estimators_[0,0],
+    #         0, -1, -1
+    #     )
+
     #do a binary classification
     def test_classify_binary(self):
-        usps = fetch_mldata("usps")
-        data_x, data_y = usps.data, usps.target 
-
+        print "testing test_classify_binary"
         #convert multilabel data to binary
-        data_y = (data_y>5).astype(np.int32)
-        dev = test_bdt(10, data_x, data_y, "classification")
+        data_y = (self.data_y>5).astype(np.int32)
+        dev = test_bdt(self.data_x, data_y, "classification")
         self.assertTrue(dev < 0.00001)
 
     #multi-class classification
     def test_classify_mc(self):
-        usps = fetch_mldata("usps")
-        data_x, data_y = usps.data, usps.target 
+        print "testing test_classify_mc"
 
-        dev = test_bdt(10, data_x, data_y, "classification")
+        dev = test_bdt(self.data_x, self.data_y, "classification")
         self.assertTrue(dev < 0.00001)
 
     #do a regression to a single variable (scalar regression)
     def test_regression_scalar(self):
-        usps = fetch_mldata("usps")
-        data_x, data_y = usps.data, usps.target 
+        print "testing test_regression_scalar"
 
-        dev = test_bdt(10, data_x, data_y, "regression")
+        dev = test_bdt(self.data_x, self.data_y, "regression")
         self.assertTrue(dev < 0.00001)
 
 if __name__ == "__main__":
-    unittest.main()
-    # usps = fetch_mldata("usps")
-    # data_x, data_y = usps.data, usps.target 
 
-    # data_y = (data_y>5).astype(np.int32)
-    # cls = GradientBoostingClassifier(
-    #     max_depth=4,
-    #     learning_rate=0.01,
-    #     n_estimators=1,
-    #     verbose=True,
-    #     min_samples_leaf=1,
-    #     min_samples_split=1,
-    #     loss = "deviance"
-    # )
-    # cls.fit(data_x, data_y)
-
-    # nodetree = {}
-
-    # for trees in cls.estimators_:
-    #     for class_tree in trees:
-    #         sklearn_to_tmva.cls_to_nodetree(cls, nodetree, class_tree.tree_, 0, -1, -1)
-
-    # nodetree[0].print_out(nodetree)
+    data = load_svmlight_files(("usps", "usps.t"))
+    data_x, data_y = data[0].todense(), data[1]
+    data_y = (data_y>5).astype(np.int32)
+    print data_x.shape, data_y.shape
+    v = test_bdt(data_x, data_y, "classification")
+    print v
+    #unittest.main()

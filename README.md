@@ -1,7 +1,8 @@
 # mlglue
 
-This library contains tools to simplify exporting between different machine learning libraries.
-In particular, it contains implementations for gradBDT-s, ...
+This library contains tools to simplify conversion between models in different machine learning libraries.
+In particular, it contains conversion code for `sklearn -> TMVA` and `xgboost -> TMVA`.
+Binary classification, multiclass and regression trees are supported.
 
 ### Installation
 
@@ -12,17 +13,24 @@ python setup.py install
 
 ### Quickstart
 
-Check out `test/test_sklearn_to_tmva.py` for a quick look into how to use this code.
+Check out `test/test_all.py` for a quick look into how to use this code.
 
-`test/test_xgboost_tmva.py` contains some example code on how to convert an xgboost tree into the internal structure.
+Here is also a small example
+~~~
+    model = xgboost.XGBClassifier(n_estimators=10)
+    model.fit(data_x, data_y_binary)
+    
+    num_features = data_x.shape[1]
+    features = ["feat{0}".format(nf) for nf in range(num_features)]
+    target_names = ["cls0", "cls1"]
 
-## Features
-
-### Gradient boosted decision trees
-
-Converts sklearn trees (classification and regression) to an internal representation, which can then be exported to other formats
-
- * sklearn -> TMVA: binary classification, multiclass, regression via conversion to a TMVA XML. On the sklearn-side, it needs a special evaluation of the decision trees, which uses the same transformation functions as TMVA
+    bdt = BDTxgboost(model, features, target_names)
+    bdt.to_tmva("test.xml")
+    bdt.setup_tmva("test.xml")
+    for irow in range(data_x.shape[0]):
+        predA = bdt.eval_tmva(data_x[irow, :])
+        predB = bdt.eval(data_x[irow, :])
+~~~
 
 # LICENSE
 
