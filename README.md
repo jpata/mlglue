@@ -5,8 +5,7 @@ In particular, it contains conversion code for `sklearn -> TMVA` and `xgboost ->
 Binary classification, multiclass and regression trees are supported.
 
 Exporting to TMVA XML:
-
-
+~~~
 ╔════════════╦═════════╦═════════╗
 ║    type    ║ sklearn ║ xgboost ║
 ╠════════════╬═════════╬═════════╣
@@ -14,6 +13,7 @@ Exporting to TMVA XML:
 ║ multiclass ║ x       ║         ║
 ║ regression ║ x       ║         ║
 ╚════════════╩═════════╩═════════╝
+~~~
 
 ### Installation
 
