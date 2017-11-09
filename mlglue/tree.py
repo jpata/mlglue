@@ -207,6 +207,20 @@ def xgbtree_to_nodetree(tree):
     return nodes
 
 class BDT(object):
+    """Generic representation for a BDT
+    
+    Attributes:
+        feature_names (TYPE): Description
+        kind (TYPE): Description
+        learning_rate (TYPE): Description
+        max_depth (TYPE): Description
+        ntrees (TYPE): Description
+        reader (TYPE): Description
+        target_names (TYPE): Description
+        tmva (TYPE): Description
+        trees (TYPE): Description
+        vardict (dict): Description
+    """
     def __init__(self, trees, kind, feature_names, target_names, max_depth, learning_rate):
         self.trees = trees
         self.kind = kind
