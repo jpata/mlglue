@@ -67,8 +67,8 @@ class Tree:
         if len(self.children) == 0:
 
             return '<Node pos="{0}" depth="{1}" NCoef="0" \
-    IVar="{2}" Cut="{3:17E}" cType="1" \
-    res="{4:17E}" rms="0.0e-00" \
+    IVar="{2}" Cut="{3:64E}" cType="1" \
+    res="{4:64E}" rms="0.0e-00" \
     purity="{5:.8E}" nType="-99">'.format(
                 kind,
                 self.depth + 1,
@@ -207,6 +207,20 @@ def xgbtree_to_nodetree(tree):
     return nodes
 
 class BDT(object):
+    """Generic representation for a BDT
+    
+    Attributes:
+        feature_names (TYPE): Description
+        kind (TYPE): Description
+        learning_rate (TYPE): Description
+        max_depth (TYPE): Description
+        ntrees (TYPE): Description
+        reader (TYPE): Description
+        target_names (TYPE): Description
+        tmva (TYPE): Description
+        trees (TYPE): Description
+        vardict (dict): Description
+    """
     def __init__(self, trees, kind, feature_names, target_names, max_depth, learning_rate):
         self.trees = trees
         self.kind = kind

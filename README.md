@@ -22,6 +22,38 @@ Clone this repository, install with
 python setup.py install
 ~~~
 
+When installing in the CMSSW software environment, you may want to install with
+~~~
+python setup.py install --user
+~~~
+Also, you need to make sure that you are loading the patched version of xgboost using
+~~~
+PYTHONPATH=~/.local/lib/python2.7/site-packages/xgboost-0.6-py2.7.egg/:$PYTHONPATH python test/test_all.py
+~~~
+
+#### xgboost installation
+Please note that you will need to increase the precision of the xgboost textual output in order to be able to import the trees from xgboost -> TMVA. Do this with the following patch in the xgboost directory:
+~~~
+diff --git a/src/tree/tree_model.cc b/src/tree/tree_model.cc
+index 06fb005..03cd8cf 100644
+--- a/src/tree/tree_model.cc
++++ b/src/tree/tree_model.cc
+@@ -19,6 +19,7 @@ void DumpRegTree2Text(std::stringstream& fo,  // NOLINT(*)
+                       const RegTree& tree,
+                       const FeatureMap& fmap,
+                       int nid, int depth, bool with_stats) {
++  fo.precision(std::numeric_limits<double>::max_digits10 + 2);
+   for (int i = 0;  i < depth; ++i) {
+     fo << '\t';
+   }
+~~~
+and then reinstall xgboost with
+~~~
+make -j4
+cd python-package
+python setup.py install --user
+~~~
+
 ### Quickstart
 
 Here is a small example
@@ -41,7 +73,7 @@ for irow in range(data_x.shape[0]):
     predB = bdt.eval(data_x[irow, :])
 ~~~
 
-Check out `test/test_all.py` for an overview and the testsuite.
+Check out `test/test_all.py` for an overview and the testsuite. You can download the test dataset using `test/data.sh`.
 
 # LICENSE
 
