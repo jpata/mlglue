@@ -67,8 +67,8 @@ class Tree:
         if len(self.children) == 0:
 
             return '<Node pos="{0}" depth="{1}" NCoef="0" \
-    IVar="{2}" Cut="{3:17E}" cType="1" \
-    res="{4:17E}" rms="0.0e-00" \
+    IVar="{2}" Cut="{3:64E}" cType="1" \
+    res="{4:64E}" rms="0.0e-00" \
     purity="{5:.8E}" nType="-99">'.format(
                 kind,
                 self.depth + 1,
