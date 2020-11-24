@@ -9,6 +9,6 @@ setup(name='mlglue',
     author_email='pata@phys.ethz.ch',
     url='http://github.com/jpata/mlglue',
     packages=['mlglue'],
-    install_requires=['sklearn', 'numpy'],
+    install_requires=['sklearn', 'numpy', 'xgboost'],
 )
 

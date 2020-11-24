@@ -19,12 +19,13 @@ Exporting to TMVA XML:
 
 Clone this repository, install with
 ~~~
-python setup.py install
+pip install -r requirements.txt
+pip install .
 ~~~
 
 When installing in the CMSSW software environment, you may want to install with
 ~~~
-python setup.py install --user
+pip install . --user
 ~~~
 Also, you need to make sure that you are loading the patched version of xgboost using
 ~~~
